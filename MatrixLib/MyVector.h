@@ -18,13 +18,13 @@ public:
   Vector(int rowsCount, T* _v);
   Vector(int rowsCount, T _v);
   Vector(Vector<T>& _v);
-  ~Vector();
+  virtual ~Vector();
 
-  Vector<T> operator +(Vector<T>& _v);
+  Vector<T> operator +( const Vector<T>& _v);
   Vector<T> operator -(Vector<T>& _v);
   Vector<T> operator *(Vector<T>& _v);
   Vector<T> operator /(Vector<T>& _v);
-  Vector<T>& operator =(Vector<T>& _v);
+  Vector<T>& operator =( const Vector<T>& _v);
   T& operator[] (const int index);
 
   Vector<T>& operator ++();
@@ -108,7 +108,7 @@ Vector<T>::~Vector()
   x = 0;
 }
 template <class T>
-Vector<T> Vector<T>::operator +(Vector<T>& _v)
+Vector<T> Vector<T>::operator +( const Vector<T>& _v)
 {
   Vector<T> res;
   res.length = MIN(length, _v.length);
@@ -157,7 +157,7 @@ Vector<T> Vector<T>::operator /(Vector<T>& _v)
   return res;
 }
 template <class T>
-Vector<T>& Vector<T>::operator =(Vector<T>& _v)
+Vector<T>& Vector<T>::operator =( const Vector<T>& _v)
 {
   if (this == &_v)
     return *this;
