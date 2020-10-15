@@ -1,294 +1,179 @@
+#include "Matrix.h"
 
-#include<Matrix.h>
 #include <gtest.h>
 
-TEST(TMatrix, can_get_max_power_set)
+TEST(TMatrix, can_create_matrix_with_positive_length)
 {
-    ASSERT_NO_THROW(TMatrix<int> A(3));
-}
-/*
-TEST(TSet, can_insert_non_existing_element)
-{
-  const int size = 5, k = 3;
-  TSet set(size);
-  set.InsElem(k);
-
-  EXPECT_NE(set.IsMember(k), 0);
+	ASSERT_NO_THROW(TMatrix<int> m(5));
 }
 
-TEST(TSet, can_insert_existing_element)
+TEST(TMatrix, cant_create_too_large_matrix)
 {
-  const int size = 5;
-  const int k = 3;
-  TSet set(size);
-  set.InsElem(k);
-  set.InsElem(k);
-
-  EXPECT_NE(set.IsMember(k), 0);
+	ASSERT_ANY_THROW(TMatrix<int> m(MAX_MATRIX_SIZE + 1));
 }
 
-TEST(TSet, can_delete_non_existing_element)
+TEST(TMatrix, throws_when_create_matrix_with_negative_length)
 {
-  const int size = 5, k = 3;
-  TSet set(size);
-  set.DelElem(k);
-
-  EXPECT_EQ(set.IsMember(k), 0);
+	ASSERT_ANY_THROW(TMatrix<int> m(-5));
 }
 
-TEST(TSet, can_delete_existing_element)
+TEST(TMatrix, can_create_copied_matrix)
 {
-  const int size = 5, k = 3;
-  TSet set(size);
+	TMatrix<int> m(5);
 
-  set.InsElem(k);
-  EXPECT_GT(set.IsMember(k), 0);
-
-  set.DelElem(k);
-  EXPECT_EQ(set.IsMember(k), 0);
+	ASSERT_NO_THROW(TMatrix<int> m1(m));
 }
 
-TEST(TSet, compare_two_sets_of_non_equal_sizes)
+TEST(TMatrix, copied_matrix_is_equal_to_source_one)
 {
-  const int size1 = 4, size2 = 6;
-  TSet set1(size1), set2(size2);
-
-  EXPECT_EQ(1, set1 != set2);
+	TMatrix<int> a(3);
+	TMatrix<int> b(a);
+	EXPECT_EQ(a, b);
 }
 
-TEST(TSet, compare_two_equal_sets)
+TEST(TMatrix, copied_matrix_has_its_own_memory)
 {
-  const int size = 4;
-  TSet set1(size), set2(size);
-  // set1 = set2 = {1, 3}
-  set1.InsElem(1);
-  set1.InsElem(3);
-  set2.InsElem(1);
-  set2.InsElem(3);
-
-  EXPECT_EQ(set1, set2);
+	TMatrix<int> a(3);
+	TMatrix<int> b(a);
+	EXPECT_NE(&a[0], &b[0]);
 }
 
-TEST(TSet, compare_two_non_equal_sets)
+TEST(TMatrix, can_get_size)
 {
-  const int size = 4;
-  TSet set1(size), set2(size);
-  // set1 = {1, 3}
-  set1.InsElem(1);
-  set1.InsElem(3);
-  // set2 = {1, 2}
-  set2.InsElem(1);
-  set2.InsElem(2);
-
-  EXPECT_EQ(1, set1 != set2);
+	TMatrix<int> m(3);
+	EXPECT_EQ(3, m.GetSize());
 }
 
-TEST(TSet, can_assign_set_of_equal_size)
+TEST(TMatrix, can_set_and_get_element)
 {
-  const int size = 4;
-  TSet set1(size), set2(size);
-  // set1 = {1, 3}
-  set1.InsElem(1);
-  set1.InsElem(3);
-  set2 = set1;
-
-  EXPECT_EQ(set1, set2);
+	TMatrix<int> m(2);
+	EXPECT_NO_THROW(m[0][0] = 0);
+	m[1][1] = 1;
+	EXPECT_EQ(1, m[1][1]);
 }
 
-TEST(TSet, can_assign_set_of_greater_size)
+TEST(TMatrix, throws_when_set_element_with_negative_index)
 {
-  const int size1 = 4, size2 = 6;
-  TSet set1(size1), set2(size2);
-  // set1 = {1, 3}
-  set1.InsElem(1);
-  set1.InsElem(3);
-  set2 = set1;
-
-  EXPECT_EQ(set1, set2);
+	TMatrix<int> m(4);
+	EXPECT_ANY_THROW(m[-2][0] = 1);
+	EXPECT_ANY_THROW(m[-1][-2] = 1);
 }
 
-TEST(TSet, can_assign_set_of_less_size)
+TEST(TMatrix, throws_when_set_element_with_too_large_index)
 {
-  const int size1 = 6, size2 = 4;
-  TSet set1(size1), set2(size2);
-  // set1 = {1, 3, 5}
-  set1.InsElem(1);
-  set1.InsElem(3);
-  set1.InsElem(5);
-  set2 = set1;
-
-  EXPECT_EQ(set1, set2);
+	TMatrix<int> m(4);
+	EXPECT_ANY_THROW(m[3][6] = 1);
 }
 
-TEST(TSet, can_insert_non_existing_element_using_plus_operator)
+TEST(TMatrix, can_assign_matrix_to_itself)
 {
-  const int size = 4;
-  const int k = 3;
-  TSet set(size), updatedSet(size);
-  set.InsElem(0);
-  set.InsElem(2);
-  updatedSet = set + k;
-
-  EXPECT_NE(0, updatedSet.IsMember(k));
+	TMatrix<int> m(2);
+	m[0][0] = 0;
+	m[0][1] = 7;
+	m[1][1] = -1;
+	ASSERT_NO_THROW(m = m);
 }
 
-TEST(TSet, throws_when_insert_non_existing_element_out_of_range_using_plus_operator)
+TEST(TMatrix, can_assign_matrices_of_equal_size)
 {
-  const int size = 4;
-  const int k = 6;
-  TSet set(size), updatedSet(size);
-  set.InsElem(0);
-  set.InsElem(2);
-
-  ASSERT_ANY_THROW(updatedSet = set + k);
+	TMatrix<int> a(2), b(2);
+	a[0][0] = 0;
+	a[0][1] = 7;
+	a[1][1] = -1;
+	EXPECT_NO_THROW(b = a);
+	b = a;
+	EXPECT_EQ(a[0][0], b[0][0]);
+	EXPECT_EQ(a[0][1], b[0][1]);
+	EXPECT_EQ(a[1][1], b[1][1]);
 }
 
-TEST(TSet, can_insert_existing_element_using_plus_operator)
+TEST(TMatrix, assign_operator_change_matrix_size)
 {
-  const int size = 4;
-  const int k = 3;
-  TSet set(size), updatedSet(size);
-  set.InsElem(0);
-  set.InsElem(k);
-  updatedSet = set + k;
-
-  EXPECT_NE(0, set.IsMember(k));
+	TMatrix<int> a(1), b(2);
+	b = a;
+	EXPECT_EQ(1, b.GetSize());
 }
 
-TEST(TSet, check_size_of_the_combination_of_two_sets_of_equal_size)
+TEST(TMatrix, can_assign_matrices_of_different_size)
 {
-  const int size = 5;
-  TSet set1(size), set2(size), set3(size);
-  // set1 = {1, 2, 4}
-  set1.InsElem(1);
-  set1.InsElem(2);
-  set1.InsElem(4);
-  // set2 = {0, 1, 2}
-  set2.InsElem(0);
-  set2.InsElem(1);
-  set2.InsElem(2);
-  set3 = set1 + set2;
-
-  EXPECT_EQ(size, set3.GetMaxPower());
+	TMatrix<int> a(2), b(1);
+	a[0][0] = 0;
+	a[0][1] = 7;
+	a[1][1] = -1;
+	EXPECT_NO_THROW(b = a);
+	b = a;
+	EXPECT_EQ(a[0][0], b[0][0]);
+	EXPECT_EQ(a[0][1], b[0][1]);
+	EXPECT_EQ(a[1][1], b[1][1]);
 }
 
-TEST(TSet, can_combine_two_sets_of_equal_size)
+TEST(TMatrix, compare_equal_matrices_return_true)
 {
-  const int size = 5;
-  TSet set1(size), set2(size), set3(size), expSet(size);
-  // set1 = {1, 2, 4}
-  set1.InsElem(1);
-  set1.InsElem(2);
-  set1.InsElem(4);
-  // set2 = {0, 1, 2}
-  set2.InsElem(0);
-  set2.InsElem(1);
-  set2.InsElem(2);
-  set3 = set1 + set2;
-  // expSet = {0, 1, 2, 4}
-  expSet.InsElem(0);
-  expSet.InsElem(1);
-  expSet.InsElem(2);
-  expSet.InsElem(4);
-
-  EXPECT_EQ(expSet, set3);
+	TMatrix<int> a(2), b(2);
+	a[0][0] = 0;
+	a[0][1] = 7;
+	a[1][1] = -1;
+	b[0][0] = 0;
+	b[0][1] = 7;
+	b[1][1] = -1;
+	EXPECT_TRUE(a == b);
 }
 
-TEST(TSet, check_size_changes_of_the_combination_of_two_sets_of_non_equal_size)
+TEST(TMatrix, compare_matrix_with_itself_return_true)
 {
-  const int size1 = 5, size2 = 7;
-  TSet set1(size1), set2(size2), set3(size1);
-  // set1 = {1, 2, 4}
-  set1.InsElem(1);
-  set1.InsElem(2);
-  set1.InsElem(4);
-  // set2 = {0, 1, 2}
-  set2.InsElem(0);
-  set2.InsElem(1);
-  set2.InsElem(2);
-  set3 = set1 + set2;
-
-  EXPECT_EQ(size2, set3.GetMaxPower());
+	TMatrix<int> m(2);
+	m[0][0] = 0;
+	m[0][1] = 7;
+	m[1][1] = -1;
+	EXPECT_TRUE(m == m);
 }
 
-TEST(TSet, can_combine_two_sets_of_non_equal_size)
+TEST(TMatrix, matrices_with_different_size_are_not_equal)
 {
-  const int size1 = 5, size2 = 7;
-  TSet set1(size1), set2(size2), set3(size1), expSet(size2);
-  // set1 = {1, 2, 4}
-  set1.InsElem(1);
-  set1.InsElem(2);
-  set1.InsElem(4);
-  // set2 = {0, 1, 2, 6}
-  set2.InsElem(0);
-  set2.InsElem(1);
-  set2.InsElem(2);
-  set2.InsElem(6);
-  set3 = set1 + set2;
-  // expSet = {0, 1, 2, 4, 6}
-  expSet.InsElem(0);
-  expSet.InsElem(1);
-  expSet.InsElem(2);
-  expSet.InsElem(4);
-  expSet.InsElem(6);
-
-  EXPECT_EQ(expSet, set3);
+	TMatrix<int> a(2), b(1);
+	EXPECT_FALSE(a == b);
 }
 
-TEST(TSet, can_intersect_two_sets_of_equal_size)
+TEST(TMatrix, can_add_matrices_with_equal_size)
 {
-  const int size = 5;
-  TSet set1(size), set2(size), set3(size), expSet(size);
-  // set1 = {1, 2, 4}
-  set1.InsElem(1);
-  set1.InsElem(2);
-  set1.InsElem(4);
-  // set2 = {0, 1, 2}
-  set2.InsElem(0);
-  set2.InsElem(1);
-  set2.InsElem(2);
-  set3 = set1 * set2;
-  // expSet = {1, 2}
-  expSet.InsElem(1);
-  expSet.InsElem(2);
-
-  EXPECT_EQ(expSet, set3);
+	TMatrix<int> a(2), b(2), c(2);
+	a[0][0] = 0;
+	a[0][1] = 7;
+	a[1][1] = -1;
+	b[0][0] = 7;
+	b[0][1] = 0;
+	b[1][1] = 1;
+	EXPECT_NO_THROW(a + b);
+	c = a + b;
+	EXPECT_EQ(7, c[0][0]);
+	EXPECT_EQ(7, c[0][1]);
+	EXPECT_EQ(0, c[1][1]);
 }
 
-TEST(TSet, can_intersect_two_sets_of_non_equal_size)
+TEST(TMatrix, cant_add_matrices_with_not_equal_size)
 {
-  const int size1 = 5, size2 = 7;
-  TSet set1(size1), set2(size2), set3(size1), expSet(size2);
-  // set1 = {1, 2, 4}
-  set1.InsElem(1);
-  set1.InsElem(2);
-  set1.InsElem(4);
-  // set2 = {0, 1, 2, 4, 6}
-  set2.InsElem(0);
-  set2.InsElem(1);
-  set2.InsElem(2);
-  set2.InsElem(4);
-  set2.InsElem(6);
-  set3 = set1 * set2;
-  // expSet = {1, 2, 4}
-  expSet.InsElem(1);
-  expSet.InsElem(2);
-  expSet.InsElem(4);
-
-  EXPECT_EQ(expSet, set3);
+	TMatrix<int> a(2), b(3);
+	ASSERT_ANY_THROW(a + b);
 }
 
-TEST(TSet, check_negation_operator)
+TEST(TMatrix, can_subtract_matrices_with_equal_size)
 {
-  const int size = 4;
-  TSet set(size), set1(size), expSet(size);
-  // set1 = {1, 3}
-  set.InsElem(1);
-  set.InsElem(3);
-  set1 = ~set;
-  // expSet = {0, 2}
-  expSet.InsElem(0);
-  expSet.InsElem(2);
+	TMatrix<int> a(2), b(2), c(2);
+	a[0][0] = 7;
+	a[0][1] = 0;
+	a[1][1] = -1;
+	b[0][0] = 0;
+	b[0][1] = -7;
+	b[1][1] = -1;
+	EXPECT_NO_THROW(a - b);
+	c = a - b;
+	EXPECT_EQ(7, c[0][0]);
+	EXPECT_EQ(7, c[0][1]);
+	EXPECT_EQ(0, c[1][1]);
+}
 
-  EXPECT_EQ(expSet, set1);
-}*/
+TEST(TMatrix, cant_subtract_matrixes_with_not_equal_size)
+{
+	TMatrix<int> a(2), b(3);
+	ASSERT_ANY_THROW(a - b);
+}
