@@ -4,7 +4,7 @@
 
 int main()
 {
-    Vector<int> A(3, 3);
+    TVector<int> A(3, 3);
     TMatrix<int> a(3);
     TMatrix<int> B = a;
     TMatrix<int> C(3);
