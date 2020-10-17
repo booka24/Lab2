@@ -2,14 +2,27 @@
 #include "MyVector.h"
 #include "Matrix.h"
 
+
 int main()
 {
-    TVector<int> A(3, 3);
-    TMatrix<int> a(3);
-    TMatrix<int> B = a;
-    TMatrix<int> C(3);
+    TMatrix<int> a(5), b(5), c(5);
+    int i, j;
 
-  a + B;
+    cout << "TEST MATRIX" << endl;
 
-  return 0;
+    for (i = 0; i < 5; i++)
+    {
+        for (j = 0; j < 5; j++)
+        {
+            a[i][j] = i;
+            b[i][j] = i;
+        }
+        c = a + b;
+    }
+
+    cout << "Matrix a = \n" << a << endl;
+    cout << "Matrix b = \n" << b << endl;
+    cout << "Matrix c = a + b \n" << c << endl;
+
+    return 0;
 }
