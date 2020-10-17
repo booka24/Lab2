@@ -59,6 +59,7 @@ public:
     }
 };
 
+
 template <class T>
 inline TVector<T>::TVector()
 {
