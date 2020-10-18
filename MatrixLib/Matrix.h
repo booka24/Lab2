@@ -6,18 +6,18 @@
 const int MAX_MATRIX_SIZE = 100000;
 
 
-template <class T> //Верхнетреугольная матрица
-class TMatrix : public TVector<TVector<T> >
+template <class ValType> //Верхнетреугольная матрица
+class TMatrix : public TVector<TVector<ValType> >
 {
 private:
     int mSize;
 public:
     TMatrix(int s);
     TMatrix(const TMatrix& mt);                        //копирование
-    TMatrix(const TVector<TVector<T> >& mt);    //преобразование типа
+    TMatrix(const TVector<TVector<ValType> >& mt);    //преобразование типа
     ~TMatrix();
 
-    int GetSize() { return this->length; };               //Получение размера Матрицы
+    int GetSize() { return mSize; };               //Получение размера Матрицы
     bool operator==(const TMatrix& mt) const;     //сравнение Матриц
     TMatrix operator= (const TMatrix& mt);       //присваивание Матриц
     TMatrix  operator+ (const TMatrix& mt);     //сложение Матриц
@@ -27,24 +27,24 @@ public:
     // ввод / вывод
     friend istream& operator>>(istream& in, TMatrix& mt)
     {
-        for (int i = 0; i < mt.length; i++)
+        for (int i = 0; i < mt.SizeM; i++)
         {
-            in >> mt.x[i];
+            in >> mt.pVector[i];
         }
         return in;
     }
     friend ostream& operator<<(ostream& out, const TMatrix& mt)
     {
-        for (int i = 0; i < mt.length; i++)
+        for (int i = 0; i < mt.SizeM; i++)
         {
-            out << mt.x[i] << endl;
+            out << mt.pVector[i] << endl;
         }
         return out;
     }
 };
 
-template<class T>
-inline TMatrix<T>::TMatrix(int s) : TVector<TVector <T> >(s)
+template<class ValType>
+inline TMatrix<ValType>::TMatrix(int s) : TVector<TVector <ValType> >(s)
 {
     if (s < 0 || s > MAX_MATRIX_SIZE)
     {
@@ -53,20 +53,20 @@ inline TMatrix<T>::TMatrix(int s) : TVector<TVector <T> >(s)
     mSize = s;
 }
 
-template <class T> //конструктор копирования
-inline TMatrix<T>::TMatrix(const TMatrix<T>& mt) : TVector<TVector<T> >(mt)
+template <class ValType> //конструктор копирования
+inline TMatrix<ValType>::TMatrix(const TMatrix<ValType>& mt) : TVector<TVector<ValType> >(mt)
 {
-    mSize = mt.length;
+    mSize = mt.SizeM;
 }
 
-template <class T> //конструктор преобразования типа
-inline TMatrix<T>::TMatrix(const TVector<TVector<T> >& mt) : TVector<TVector<T> >(mt)
+template <class ValType> //конструктор преобразования типа
+inline TMatrix<ValType>::TMatrix(const TVector<TVector<ValType> >& mt) : TVector<TVector<ValType> >(mt)
 {
 
 }
 
-template<class T>
-inline TMatrix<T>::~TMatrix()
+template<class ValType>
+inline TMatrix<ValType>::~TMatrix()
 {
     if (mSize != 0)
     {
@@ -74,86 +74,96 @@ inline TMatrix<T>::~TMatrix()
     }
 }
 
-template <class T> //сравнение
-bool TMatrix<T>::operator==(const TMatrix<T>& mt) const
+template <class ValType> //сравнение
+bool TMatrix<ValType>::operator==(const TMatrix<ValType>& mt) const
 {
     bool res = true;
-    int S = this->length;
-    if (S != mt.length)
+    int S = this->SizeM;
+
+    if (S != mt.SizeM)
     {
-        return res = false;
+        res = false;
     }
 
     for (int i = 0; i < S; i++)
     {
-        if (this->x[i] == mt.x[i])
+        if (this->pVector[i] == mt.pVector[i])
         {
             res = true;
-            break;
         }
-        else res = true;
+        else res = false;
     }
 
     return res;
 }
 
-template <class T> //присваивание
-inline TMatrix<T> TMatrix<T>::operator=(const TMatrix<T>& mt)
+template <class ValType> //присваивание
+inline TMatrix<ValType> TMatrix<ValType>::operator=(const TMatrix<ValType>& mt)
 {
-    if (this == &mt)
-        return *this;
-     delete[] this->x;
-     this->length = mt.length;
-     this->x = new TVector<T>[this->length];
-     for (int i = 0; i < this->length; i++)
-     {
-         this->x[i] = mt.x[i];
-     }
+    if (this != &mt)
+    {
+        if (this->SizeM != mt.SizeM)
+        {
+            if (this->pVector != NULL)
+            {
+                delete[] this->pVector;
+            }
+            this->pVector = new TVector<ValType>[mt.SizeM];
+        }
+
+        this->SizeM = mt.SizeM;
+
+        for (int i = 0; i < this->SizeM; i++)
+        {
+            this->pVector[i] = mt.pVector[i];
+        }
+    }
+
     return *this;
 }
 
-template <class T> // сложение
-inline TMatrix<T> TMatrix<T>::operator+(const TMatrix<T>& mt)
+template <class ValType> // сложение
+inline TMatrix<ValType> TMatrix<ValType>::operator+(const TMatrix<ValType>& mt)
 {
-    if (this->GetSize() != mt.length)
+    if (this->GetSize() != mt.SizeM)
     {
         throw  logic_error("ERROR");
     }
 
-    TMatrix<T> temp(*this);
+    TMatrix<ValType> temp(*this);
 
-    for (int i = 0; i < this->length; i++)
+    for (int i = 0; i < this->SizeM; i++)
     {
-        temp.x[i] = temp.x[i] + mt.x[i];
+        temp.pVector[i] = temp.pVector[i] + mt.pVector[i];
     }
     return temp;
 }
 
-template <class T> //вычитание
-inline TMatrix<T> TMatrix<T>::operator-(const TMatrix<T>& mt)
+template <class ValType> //вычитание
+inline TMatrix<ValType> TMatrix<ValType>::operator-(const TMatrix<ValType>& mt)
 {
-    if (this->GetSize() != mt.length)
+    if (this->GetSize() != mt.SizeM)
     {
         throw  logic_error("ERROR");
     }
 
-    TMatrix<T> temp(*this);
+    TMatrix<ValType> temp(*this);
 
-    for (int i = 0; i < this->length; i++)
+    for (int i = 0; i < this->SizeM; i++)
     {
-        temp.x[i] = temp.x[i] - mt.x[i];
+        temp.pVector[i] = temp.pVector[i] - mt.pVector[i];
     }
     return temp;
 }
 
-template<class T>
-inline TMatrix<T> TMatrix<T>::operator*(const TMatrix& mt)
+template<class ValType>
+inline TMatrix<ValType> TMatrix<ValType>::operator*(const TMatrix& mt)
 {
-    TMatrix<T> temp(*this);
+    TMatrix<ValType> temp(*this);
 
-    for (int i = 0; i < this->length; i++)
+    for (int i = 0; i < this->SizeM; i++)
     {
-        temp.x[i] = temp.x[i] * mt.x[i];
+        temp.pVector[i] = temp.pVector[i] * mt.pVector[i];
     }
     return temp;
 }

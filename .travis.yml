@@ -3,8 +3,8 @@ compiler:
   - gcc
   - clang
 before_script:
-  - mkdir ../build2
-  - cd ../build2
+  - mkdir ../build
+  - cd ../build
 script:
   - cmake ../lab2-v
   - make -j
